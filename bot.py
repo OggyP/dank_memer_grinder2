@@ -10,8 +10,14 @@ class Bot:
         self.focused = False
         self.config = self.parse_config()
 
-        self.tasks = []
-        asyncio.run(self.run())
+        self.loop = asyncio.get_event_loop()
+
+        # self.loop.create_task(self.check_discord_window())
+        for command_data in self.config['commands']:
+            self.loop.create_task(self.run_command(command_data))
+
+        self.loop.run_forever()
+        
 
     @staticmethod
     def parse_config():
@@ -32,20 +38,6 @@ class Bot:
     #             self.focused = False
 
     #         await asyncio.sleep(0.5)
-
-    # Run commands
-
-    async def run(self):
-        # self.tasks.append(asyncio.create_task(self.check_discord_window()))
-        for command_data in self.config['commands']:
-            task = asyncio.create_task(self.run_command(command_data))
-            self.tasks.append(task)
-
-        for task in self.tasks:
-            try:
-                await task
-            finally:
-                pass
 
     async def run_command(self, command_data):
         while True:
